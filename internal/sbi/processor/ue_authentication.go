@@ -231,6 +231,13 @@ func (p *Processor) EapAuthComfirmRequestProcedure(
 		eapSession.AuthResult = models.AusfUeAuthenticationAuthResult_FAILURE
 	}
 
+	if eapSession.AuthResult == models.AusfUeAuthenticationAuthResult_SUCCESS ||
+		eapSession.AuthResult == models.AusfUeAuthenticationAuthResult_FAILURE {
+		logger.AuthELog.Infof("EAP-AKA' procedure finished with status %s, deleting context for %s", eapSession.AuthResult, currentSupi)
+		ausf_context.RemoveAusfUeContextFromPool(currentSupi)
+		ausf_context.RemoveSuciSupiPairFromMap(eapSessionID)
+	}
+
 	c.JSON(http.StatusOK, eapSession)
 }
 
@@ -597,8 +604,14 @@ func (p *Processor) Auth5gAkaComfirmRequestProcedure(c *gin.Context, updateConfi
 		}
 		c.Set(sbi.IN_PB_DETAILS_CTX_STR, problemDetails.Cause)
 		c.JSON(http.StatusInternalServerError, problemDetails)
+
+		ausf_context.RemoveAusfUeContextFromPool(currentSupi)
+		ausf_context.RemoveSuciSupiPairFromMap(ConfirmationDataResponseID)
 		return
 	}
+
+	ausf_context.RemoveAusfUeContextFromPool(currentSupi)
+	ausf_context.RemoveSuciSupiPairFromMap(ConfirmationDataResponseID)
 
 	c.JSON(http.StatusOK, confirmDataRsp)
 }

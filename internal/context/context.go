@@ -120,6 +120,10 @@ func AddAusfUeContextToPool(ausfUeContext *AusfUeContext) {
 	ausfContext.UePool.Store(ausfUeContext.Supi, ausfUeContext)
 }
 
+func RemoveAusfUeContextFromPool(supi string) {
+	ausfContext.UePool.Delete(supi)
+}
+
 func CheckIfAusfUeContextExists(ref string) bool {
 	_, ok := ausfContext.UePool.Load(ref)
 	return ok
@@ -136,6 +140,10 @@ func AddSuciSupiPairToMap(supiOrSuci string, supi string) {
 	newPair.SupiOrSuci = supiOrSuci
 	newPair.Supi = supi
 	ausfContext.suciSupiMap.Store(supiOrSuci, newPair)
+}
+
+func RemoveSuciSupiPairFromMap(suci string) {
+	ausfContext.suciSupiMap.Delete(suci)
 }
 
 func CheckIfSuciSupiPairExists(ref string) bool {
